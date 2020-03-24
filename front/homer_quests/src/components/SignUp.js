@@ -33,8 +33,9 @@ class SignUp extends Component {
       lastname: e.target.value
     });
   };
-  handleSubmit = () => {
-    console.log("to test" + this.state);
+  handleSubmit = e => {
+    e.preventDefault();
+    console.log(this.state);
   };
 
   render() {
