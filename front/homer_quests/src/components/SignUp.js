@@ -4,9 +4,9 @@ class SignUp extends Component {
   state = {
     email: "mon@email.com",
     password: "monPassw0rd",
-    passwordConfirm: "monPassw0rd",
     name: "James",
-    lastname: "Bond"
+    lastname: "Bond",
+    flash: ""
   };
   updateEmailField = e => {
     this.setState({
@@ -18,11 +18,11 @@ class SignUp extends Component {
       password: e.target.value
     });
   };
-  updatePwdConfirmField = e => {
-    this.setState({
-      passwordConfirm: e.target.value
-    });
-  };
+  // updatePwdConfirmField = e => {
+  //   this.setState({
+  //     passwordConfirm: e.target.value
+  //   });
+  // };
   updateNameField = e => {
     this.setState({
       name: e.target.value
@@ -35,7 +35,17 @@ class SignUp extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state);
+
+    fetch("/auth/signup", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json"
+      }),
+      body: JSON.stringify(this.state)
+    })
+      .then(res => res.json())
+      .then(res => this.setState({ flash: res.flash }))
+      .catch(err => this.setState({ flash: err.flash }));
   };
 
   render() {
@@ -45,11 +55,11 @@ class SignUp extends Component {
         <form onSubmit={this.handleSubmit}>
           <input type="email" name="email" onChange={this.updateEmailField} />
           <input type="text" name="password" onChange={this.updatePwdField} />
-          <input
+          {/* <input
             type="text"
             name="password_confirm"
-            onChange={this.updatePwdConfirmField}
-          />
+            // onChange={this.updatePwdConfirmField}
+          /> */}
           <input type="text" name="name" onChange={this.updateNameField} />
           <input
             type="text"
