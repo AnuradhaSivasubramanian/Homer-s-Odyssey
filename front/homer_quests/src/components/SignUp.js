@@ -1,12 +1,17 @@
 import React, { Component } from "react";
+import { Button, TextField, Snackbar } from "@material-ui/core";
 
+import "../components/signup.css";
+const vertical = "bottom";
+const horizontal = "center";
 class SignUp extends Component {
   state = {
     email: "mon@email.com",
     password: "monPassw0rd",
     name: "James",
     lastname: "Bond",
-    flash: ""
+    flash: "",
+    open: false
   };
   updateEmailField = e => {
     this.setState({
@@ -18,6 +23,7 @@ class SignUp extends Component {
       password: e.target.value
     });
   };
+
   // updatePwdConfirmField = e => {
   //   this.setState({
   //     passwordConfirm: e.target.value
@@ -46,27 +52,64 @@ class SignUp extends Component {
       .then(res => res.json())
       .then(res => this.setState({ flash: res.flash }))
       .catch(err => this.setState({ flash: err.flash }));
+    this.setState({ open: true });
+  };
+  handleClose = () => {
+    this.setState({ open: false });
   };
 
   render() {
     return (
-      <div>
-        <h1>{JSON.stringify(this.state, 1, 1)}</h1>
-        <form onSubmit={this.handleSubmit}>
-          <input type="email" name="email" onChange={this.updateEmailField} />
-          <input type="text" name="password" onChange={this.updatePwdField} />
-          {/* <input
+      <div className="signup_maincontainer">
+        <h1>Sign up!!</h1>
+        <form onSubmit={this.handleSubmit} className="signup_container">
+          <TextField
+            label="email"
+            type="email"
+            name="email"
+            onChange={this.updateEmailField}
+          />
+          <TextField
+            label="password"
+            type="text"
+            name="password"
+            onChange={this.updatePwdField}
+          />
+          <TextField
+            label="confirm password"
             type="text"
             name="password_confirm"
-            // onChange={this.updatePwdConfirmField}
-          /> */}
-          <input type="text" name="name" onChange={this.updateNameField} />
-          <input
+          />
+          <TextField
+            label="name"
+            type="text"
+            name="name"
+            onChange={this.updateNameField}
+          />
+          <TextField
+            label="last name"
             type="text"
             name="lastname"
             onChange={this.updateLastnameField}
+          />{" "}
+          <Button
+            className="button_form"
+            variant="contained"
+            color="primary"
+            value="submit"
+            onClick={this.handleSubmit}
+          >
+            Submit
+          </Button>
+          <Snackbar
+            anchorOrigin={{ vertical, horizontal }}
+            open={this.state.open}
+            onClose={this.handleClose}
+            ContentProps={{
+              "aria-describedby": "message-id"
+            }}
+            message={<span id="message-id">{this.state.flash}</span>}
           />
-          <input type="submit" value="Submit" />
         </form>
       </div>
     );
