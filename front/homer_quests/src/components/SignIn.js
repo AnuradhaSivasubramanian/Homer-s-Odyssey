@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { Button, TextField } from "@material-ui/core";
+import { Link, Redirect } from "react-router-dom";
 
 import "../components/signin.css";
 
 class SignIn extends Component {
   state = {
     email: "mon@email.com",
-    password: "monPassw0rd"
+    password: "monPassw0rd",
+    signin: false
   };
   updateEmailField = e => {
     this.setState({
@@ -21,22 +23,27 @@ class SignIn extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-
-    fetch("/auth/signin", {
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json"
-      }),
-      body: JSON.stringify(this.state)
-    })
-      .then(res => res.json())
-      .then(res => this.setState({ flash: res.flash }))
-      .catch(err => this.setState({ flash: err.flash }));
+    this.setState({ signin: true });
+    // fetch("/auth/signin", {
+    //   method: "POST",
+    //   headers: new Headers({
+    //     "Content-Type": "application/json"
+    //   }),
+    //   body: JSON.stringify(this.state)
+    // })
+    //   .then(res => res.json())
+    //   .then(res => this.setState({ flash: res.flash, signin: true }))
+    //   .catch(err => this.setState({ flash: err.flash }));
   };
 
   render() {
+    if (this.state.signin === true) {
+      return <Redirect to="/profile" />;
+    }
     return (
       <div className="signin_maincontainer">
+        <Link to="/signup">Sign Up</Link>
+
         <h1>Sign in!!</h1>
         <form onSubmit={this.handleSubmit} className="signin_container">
           <TextField

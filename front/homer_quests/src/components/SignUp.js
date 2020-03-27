@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Button, TextField, Snackbar } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 import "../components/signup.css";
 const vertical = "bottom";
@@ -61,6 +62,8 @@ class SignUp extends Component {
   render() {
     return (
       <div className="signup_maincontainer">
+        <Link to="/signin">Sign In</Link>
+
         <h1>Sign up!!</h1>
         <form onSubmit={this.handleSubmit} className="signup_container">
           <TextField

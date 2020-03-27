@@ -2,6 +2,7 @@ import React from "react";
 import SignUp from "./components/SignUp";
 import SignIn from "./components/SignIn";
 import Profile from "./components/Profile";
+import { Switch, Route } from "react-router-dom";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -18,7 +19,12 @@ function App() {
                   <img src="http://images.innoveduc.fr/react_odyssey_homer/wildhomer.png" />
                 </Grid>
                 <Grid item xs={12} sm={6} alignContent="center">
-                  <Profile />
+                  <Switch>
+                    <Route exact path="/" component={SignIn} />
+                    <Route path="/signin" component={SignIn} />
+                    <Route path="/signup" component={SignUp} />
+                    <Route path="/profile" component={Profile} />
+                  </Switch>
                 </Grid>
               </Grid>
             </Paper>
