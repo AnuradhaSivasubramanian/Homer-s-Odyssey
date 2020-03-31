@@ -1,14 +1,18 @@
 import React, { Component } from "react";
-import { Button, TextField } from "@material-ui/core";
+import { Button, TextField, Snackbar } from "@material-ui/core";
 import { Link, Redirect } from "react-router-dom";
-
 import "../components/signin.css";
+
+const vertical = "bottom";
+const horizontal = "center";
 
 class SignIn extends Component {
   state = {
     email: "mon@email.com",
     password: "monPassw0rd",
-    signin: false
+    signin: false,
+    flash: "",
+    open: false
   };
   updateEmailField = e => {
     this.setState({
@@ -23,17 +27,33 @@ class SignIn extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.setState({ signin: true });
-    // fetch("/auth/signin", {
-    //   method: "POST",
-    //   headers: new Headers({
-    //     "Content-Type": "application/json"
-    //   }),
-    //   body: JSON.stringify(this.state)
-    // })
-    //   .then(res => res.json())
-    //   .then(res => this.setState({ flash: res.flash, signin: true }))
-    //   .catch(err => this.setState({ flash: err.flash }));
+    const user = {
+      email: this.state.email,
+      password: this.state.password
+    };
+    console.log("I am inside fetch");
+    fetch("/auth/signin", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json"
+      }),
+      body: JSON.stringify(user)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.hasOwnProperty("user")) {
+          this.setState({ signin: true });
+          console.log(data.token);
+        } else {
+          this.setState({ flash: data.message });
+          console.log(this.state.flash);
+        }
+      })
+      .catch(err => this.setState({ flash: err.flash }));
+    this.setState({ open: true });
+  };
+  handleClose = () => {
+    this.setState({ open: false });
   };
 
   render() {
@@ -58,11 +78,7 @@ class SignIn extends Component {
             name="password"
             onChange={this.updatePwdField}
           />
-          <TextField
-            label="confirm password"
-            type="text"
-            name="password_confirm"
-          />
+
           <Button
             className="button_form"
             variant="contained"
@@ -72,6 +88,15 @@ class SignIn extends Component {
           >
             Submit
           </Button>
+          <Snackbar
+            anchorOrigin={{ vertical, horizontal }}
+            open={this.state.open}
+            onClose={this.handleClose}
+            ContentProps={{
+              "aria-describedby": "message-id"
+            }}
+            message={<span id="message-id">{this.state.flash}</span>}
+          />
         </form>
       </div>
     );
