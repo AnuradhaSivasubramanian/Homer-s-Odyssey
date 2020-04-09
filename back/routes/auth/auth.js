@@ -23,7 +23,7 @@ authRouter.post("/signup", (req, res, next) => {
   const name = req.body.name;
   const lastname = req.body.lastname;
   const saltRounds = 10;
-  bcrypt.hash(password, saltRounds, function(err, hash) {
+  bcrypt.hash(password, saltRounds, function (err, hash) {
     connection.query(
       "INSERT INTO users (email, password, name, lastname) VALUES (?, ?, ?, ?)",
       [email, hash, name, lastname],
@@ -40,16 +40,16 @@ passport.use(
     {
       usernameField: "email",
       passwordField: "password",
-      session: true
+      session: true,
     },
-    function(email, password, done) {
+    function (email, password, done) {
       console.log("email=" + email);
       console.log("password=" + password);
       connection.query(
         "SELECT * FROM users WHERE email = ?",
 
         [email],
-        async function(err, results) {
+        async function (err, results) {
           if (err) {
             return done(err + "I am here");
           }
@@ -68,7 +68,10 @@ passport.use(
             return done(null, false, { message: "Incorrect password." });
           }
 
-          return done(null, results[0]);
+          const user = {
+            email: results[0].email,
+          };
+          return done(null, user);
         }
       );
     }
@@ -79,19 +82,23 @@ passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.ACCESS_TOKEN_SECRET
+      secretOrKey: process.env.ACCESS_TOKEN_SECRET,
     },
-    function(jwtPayload, done) {
+    function (jwtPayload, done) {
       connection.query(
         "SELECT * FROM users WHERE email = ?",
 
         [jwtPayload.email],
-        function(err, results) {
+        function (err, results) {
           if (err) {
             return done(err);
           }
-          console.log("this is jwt part");
-          return done(null, results[0]);
+          const user = {
+            email: results[0].email,
+            name: results[0].name,
+            lastname: results[0].lastname,
+          };
+          return done(null, user);
         }
       );
     }
@@ -99,7 +106,6 @@ passport.use(
 );
 
 authRouter.post("/signin", (req, res, next) => {
-  console.log("to test");
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       console.log("this is the error space");
@@ -111,8 +117,8 @@ authRouter.post("/signin", (req, res, next) => {
         JSON.stringify(user),
         process.env.ACCESS_TOKEN_SECRET
       );
-
-      return res.send({ user, token });
+      console.log(token);
+      return res.send({ user, token, message: "user successful" });
     }
     return res.send(user);
   })(req, res);
@@ -120,11 +126,11 @@ authRouter.post("/signin", (req, res, next) => {
 authRouter.get(
   "/profile",
   passport.authenticate("jwt", { session: false }),
-  function(req, res) {
+  function (req, res) {
     res.send(req.user);
   }
 );
 
 module.exports = {
-  authRouter
+  authRouter,
 };

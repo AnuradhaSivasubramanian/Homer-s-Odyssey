@@ -1,11 +1,14 @@
 import React from "react";
-import SignUp from "./components/SignUp";
-import SignIn from "./components/SignIn";
-import Profile from "./components/Profile";
+import SignUp from "./containers/SignUp";
+import SignIn from "./containers/SignIn";
+import Profile from "./containers/Profile";
 import { Switch, Route } from "react-router-dom";
 import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+
+import Authentication from "./hoc/requireAuth";
+import NoAuthentication from "./hoc/requireNoAuth";
 
 function App() {
   return (
@@ -20,10 +23,23 @@ function App() {
                 </Grid>
                 <Grid item xs={12} sm={6} alignContent="center">
                   <Switch>
-                    <Route exact path="/" component={SignIn} />
-                    <Route path="/signin" component={SignIn} />
-                    <Route path="/signup" component={SignUp} />
-                    <Route path="/profile" component={Profile} />
+                    <Route
+                      exact
+                      path="/"
+                      component={NoAuthentication(SignIn)}
+                    />
+                    <Route
+                      path="/signin"
+                      component={NoAuthentication(SignIn)}
+                    />
+                    <Route
+                      path="/signup"
+                      component={NoAuthentication(SignUp)}
+                    />
+                    <Route
+                      path="/profile"
+                      component={Authentication(Profile)}
+                    />
                   </Switch>
                 </Grid>
               </Grid>

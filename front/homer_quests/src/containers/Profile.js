@@ -4,6 +4,7 @@ import ListItem from "@material-ui/core/ListItem";
 import { Button } from "@material-ui/core";
 import ListItemText from "@material-ui/core/ListItemText";
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
 
 class Profile extends Component {
   state = {
@@ -11,13 +12,32 @@ class Profile extends Component {
       email: "homer.simpson@wildcodeschool.fr",
       name: "Homer",
       lastname: "Simpson",
-      signin: false
-    }
+    },
+    signin: false,
   };
-  handleSubmit = e => {
+
+  componentDidMount() {
+    if (this.props.token) {
+      fetch("/auth/profile", {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + this.props.token,
+        },
+      })
+        .then((res) => {
+          if (res.ok) return res.json();
+          else throw new Error(res.statusText);
+        })
+        .then((res) => {
+          this.setState({ profile: res });
+        })
+        .catch();
+    }
+  }
+  handleSubmit = (e) => {
     e.preventDefault();
     this.setState({
-      signin: true
+      signin: true,
     });
   };
   render() {
@@ -50,5 +70,8 @@ class Profile extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return { token: state.auth.token };
+};
 
-export default Profile;
+export default connect(mapStateToProps)(Profile);

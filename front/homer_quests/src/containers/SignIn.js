@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, TextField, Snackbar } from "@material-ui/core";
 import { Link, Redirect } from "react-router-dom";
 import "../components/signin.css";
+import { connect } from "react-redux";
 
 const vertical = "bottom";
 const horizontal = "center";
@@ -12,48 +13,60 @@ class SignIn extends Component {
     password: "monPassw0rd",
     signin: false,
     flash: "",
-    open: false
+    open: false,
   };
-  updateEmailField = e => {
+  // componentDidMount() {
+  //   console.log("this is signin");
+  //   console.log(this.state.signin);
+  //   this.setState({
+  //     signin: false,
+  //   });
+  // }
+
+  updateEmailField = (e) => {
     this.setState({
-      email: e.target.value
+      email: e.target.value,
     });
   };
-  updatePwdField = e => {
+  updatePwdField = (e) => {
     this.setState({
-      password: e.target.value
+      password: e.target.value,
     });
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     const user = {
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
     };
-    console.log("I am inside fetch");
+
     fetch("/auth/signin", {
       method: "POST",
       headers: new Headers({
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       }),
-      body: JSON.stringify(user)
+      body: JSON.stringify(user),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.hasOwnProperty("user")) {
-          this.setState({ signin: true });
-          console.log(data.token);
+          this.props.dispatch({
+            type: "CREATE_SESSION",
+            token: data.token,
+          });
+          this.setState({ flash: data.message, signin: true });
         } else {
-          this.setState({ flash: data.message });
+          this.setState({ flash: data.message, signin: true });
           console.log(this.state.flash);
         }
       })
-      .catch(err => this.setState({ flash: err.flash }));
+      .catch((err) => this.setState({ flash: err.flash }));
+
     this.setState({ open: true });
   };
   handleClose = () => {
-    this.setState({ open: false });
+    this.setState({ open: false, signin: false });
   };
 
   render() {
@@ -93,7 +106,7 @@ class SignIn extends Component {
             open={this.state.open}
             onClose={this.handleClose}
             ContentProps={{
-              "aria-describedby": "message-id"
+              "aria-describedby": "message-id",
             }}
             message={<span id="message-id">{this.state.flash}</span>}
           />
@@ -102,4 +115,9 @@ class SignIn extends Component {
     );
   }
 }
-export default SignIn;
+const mapStateToProps = (state) => {
+  return {
+    flash: state.auth.token,
+  };
+};
+export default connect(mapStateToProps)(SignIn);
